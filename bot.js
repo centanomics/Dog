@@ -42,8 +42,8 @@ client.on('message', async (message) => {
   }
   const words = process.env.WORD.split(',');
   if (
-    message.content.includes(words[0]) ||
-    message.content.includes(words[1])
+    message.content.toLowerCase().includes(words[0]) ||
+    message.content.toLowerCase().includes(words[1])
   ) {
     const userCount = await WordCount.findOne({
       guildId: message.guild.id,
