@@ -22,7 +22,7 @@ const WordCount = require('./models/WordCount');
 connectDB();
 
 const client = new Discord.Client();
-const prefix = '/';
+const prefix = '~';
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
@@ -40,28 +40,26 @@ client.on('message', async (message) => {
   if (message.author.bot) {
     return;
   }
-  const words = process.env.WORD.split(',');
-  if (
-    message.content.toLowerCase().includes(words[0]) ||
-    message.content.toLowerCase().includes(words[1])
-  ) {
+  const regex = new RegExp(process.env.WORD_REGEX, 'g');
+  const wordsCount = [...message.content.matchAll(regex)];
+
+  if (wordsCount.length !== 0) {
     const userCount = await WordCount.findOne({
       guildId: message.guild.id,
       userId: message.author.id,
     });
-    // console.log(userCount);
     if (userCount === null) {
       const newUserCount = new WordCount({
         _id: uuid.v4(),
         userId: message.author.id,
         guildId: message.guild.id,
-        count: 1,
+        count: wordsCount.length,
       });
 
       const upUserCount = await newUserCount.save();
     } else {
       const userCountFields = {
-        count: userCount.count + 1,
+        count: userCount.count + wordsCount.length,
       };
 
       const upUserCount = await WordCount.findByIdAndUpdate(
