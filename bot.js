@@ -5,6 +5,7 @@ const path = require('path');
 const app = express();
 const port = 4000;
 
+//server setup
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname + '/public/index.html'));
 });
@@ -26,6 +27,7 @@ const prefix = '~';
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
+// when the bot is ready logs it and sets a status
 client.on('ready', () => {
   console.log('Dog is ready!');
   client.user.setPresence({
@@ -37,9 +39,12 @@ client.on('ready', () => {
 });
 
 client.on('message', async (message) => {
+  // if the user is a bot skip
   if (message.author.bot) {
     return;
   }
+
+  // checks to see if a user has said a specific word(s)
   const regex = new RegExp(process.env.WORD_REGEX, 'g');
   const wordsCount = [...message.content.matchAll(regex)];
 
@@ -70,6 +75,7 @@ client.on('message', async (message) => {
     }
   }
 
+  // if the user isnt using the command prefix, skip
   if (!message.content.startsWith(prefix)) {
     return;
   }
@@ -77,6 +83,7 @@ client.on('message', async (message) => {
   const args = message.content.slice(prefix.length).split(/ +/);
   const command = args.shift().toLowerCase();
 
+  // if the command used is count, share the amount of times the user has said the word
   if (command === 'count') {
     const userCount = await WordCount.findOne({
       guildId: message.guild.id,
@@ -84,7 +91,9 @@ client.on('message', async (message) => {
     });
 
     if (userCount === null) {
-      message.channel.send("You haven't said the n word yet, congrats!");
+      message.channel.send(
+        `You haven't said ${process.env.WORD_REF} yet, congrats!`
+      );
     } else {
       message.channel.send(
         `You have said the n word ${userCount.count} time(s)`
