@@ -48,6 +48,7 @@ client.on('message', async (message) => {
   const regex = new RegExp(process.env.WORD_REGEX, 'g');
   const wordsCount = [...message.content.matchAll(regex)];
 
+  //if the user exists in the db, add to their count. If not creat a user in the db
   if (wordsCount.length !== 0) {
     const userCount = await WordCount.findOne({
       guildId: message.guild.id,
@@ -80,6 +81,7 @@ client.on('message', async (message) => {
     return;
   }
 
+  // grabs command name
   const args = message.content.slice(prefix.length).split(/ +/);
   const command = args.shift().toLowerCase();
 
