@@ -92,7 +92,7 @@ client.on('message', async (message) => {
       userId: message.author.id,
     });
 
-    if (userCount === null) {
+    if (userCount === null || userCount === 0) {
       message.channel.send(
         `You haven't said ${process.env.WORD_REF} yet, congrats!`
       );
