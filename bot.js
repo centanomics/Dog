@@ -98,7 +98,7 @@ client.on('message', async (message) => {
       );
     } else {
       message.channel.send(
-        `You have said the n word ${userCount.count} time(s)`
+        `You have said the ${process.env.WORD_REF} ${userCount.count} time(s)`
       );
     }
     return;
