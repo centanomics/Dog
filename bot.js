@@ -104,3 +104,43 @@ client.on('message', async (message) => {
     return;
   }
 });
+
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+   // if the user is a bot skip
+  if (oldMessage.author.bot) {
+    return;
+  }
+
+  // checks to see if a user has said a specific word(s)
+  const regex = new RegExp(process.env.WORD_REGEX, 'g');
+  const wordsCount = [...newMessage.content.matchAll(regex)];
+
+  //if the user exists in the db, add to their count. If not creat a user in the db
+  if (wordsCount.length !== 0) {
+    const userCount = await WordCount.findOne({
+      guildId: newMessage.guild.id,
+      userId: newMessage.author.id,
+    });
+    if (userCount === null) {
+      const newUserCount = new WordCount({
+        _id: uuid.v4(),
+        userId: newMessage.author.id,
+        guildId: newMessage.guild.id,
+        count: wordsCount.length,
+      });
+
+      const upUserCount = await newUserCount.save();
+    } else {
+      const userCountFields = {
+        count: userCount.count + wordsCount.length,
+      };
+
+      const upUserCount = await WordCount.findByIdAndUpdate(
+        userCount._id,
+        { $set: userCountFields },
+        { new: true }
+      );
+    }
+  }
+
+})
