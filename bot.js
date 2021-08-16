@@ -47,6 +47,30 @@ client.on('message', async (message) => {
   // checks to see if a user has said a specific word(s)
   const regex = new RegExp(process.env.WORD_REGEX, 'g');
   const wordsCount = [...message.content.matchAll(regex)];
+  let extraCount = 0;
+
+  // checks to see if any user nicknames or usernames contain the word(s)
+  // userMentions.nickname, userMentions.user.username
+  // const userMentions = message.mentions.members;
+  // console.log(userMentions)
+  // for(let i = 0; i < userMentions.size; i++) {
+  //   console.log(userMentions[i])
+  //   if (!userMentions[i].nickname) {
+  //     console.log('username')
+  //     const mentionCount = [...userMentions[i].user.username.matchAll(regex)];
+  //     if(mentionCount.length !== 0) {
+  //       extraCount += mentionCount.length;
+  //     }
+  //   } else {
+  //     console.log('nickname')
+  //     const mentionCount = [...userMentions[i].nickname.matchAll(regex)];
+  //     if(mentionCount.length !== 0) {
+  //       extraCount += mentionCount.length;
+  //     }  
+  //   }
+
+  // }
+
 
   //if the user exists in the db, add to their count. If not creat a user in the db
   if (wordsCount.length !== 0) {
@@ -59,13 +83,13 @@ client.on('message', async (message) => {
         _id: uuid.v4(),
         userId: message.author.id,
         guildId: message.guild.id,
-        count: wordsCount.length,
+        count: wordsCount.length + extraCount,
       });
 
       const upUserCount = await newUserCount.save();
     } else {
       const userCountFields = {
-        count: userCount.count + wordsCount.length,
+        count: userCount.count + wordsCount.length + extraCount,
       };
 
       const upUserCount = await WordCount.findByIdAndUpdate(
