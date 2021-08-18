@@ -50,30 +50,26 @@ client.on('message', async (message) => {
   let extraCount = 0;
 
   // checks to see if any user nicknames or usernames contain the word(s)
-  userMentions.nickname, userMentions.user.username
+  // userMentions.nickname, userMentions.user.username
   const userMentions = message.mentions.members;
-  console.log(userMentions)
-  for(let i = 0; i < userMentions.size; i++) {
-    console.log(userMentions[i])
-    if (!userMentions[i].nickname) {
-      console.log('username')
-      const mentionCount = [...userMentions[i].user.username.matchAll(regex)];
+  userMentions.map(userMention =>  {
+    if (!userMention.nickname) {
+      // console.log('username')
+      const mentionCount = [...userMention.user.username.matchAll(regex)];
       if(mentionCount.length !== 0) {
         extraCount += mentionCount.length;
       }
     } else {
-      console.log('nickname')
-      const mentionCount = [...userMentions[i].nickname.matchAll(regex)];
+      // console.log('nickname')
+      const mentionCount = [...userMention.nickname.matchAll(regex)];
       if(mentionCount.length !== 0) {
         extraCount += mentionCount.length;
       }  
     }
-
-  }
-
+  })
 
   //if the user exists in the db, add to their count. If not creat a user in the db
-  if (wordsCount.length !== 0) {
+  if (wordsCount.length !== 0 || extraCount !== 0) {
     const userCount = await WordCount.findOne({
       guildId: message.guild.id,
       userId: message.author.id,
