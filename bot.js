@@ -52,21 +52,21 @@ client.on('message', async (message) => {
   // checks to see if any user nicknames or usernames contain the word(s)
   // userMentions.nickname, userMentions.user.username
   const userMentions = message.mentions.members;
-  userMentions.map(userMention =>  {
+  userMentions.map((userMention) => {
     if (!userMention.nickname) {
       // console.log('username')
       const mentionCount = [...userMention.user.username.matchAll(regex)];
-      if(mentionCount.length !== 0) {
+      if (mentionCount.length !== 0) {
         extraCount += mentionCount.length;
       }
     } else {
       // console.log('nickname')
       const mentionCount = [...userMention.nickname.matchAll(regex)];
-      if(mentionCount.length !== 0) {
+      if (mentionCount.length !== 0) {
         extraCount += mentionCount.length;
-      }  
+      }
     }
-  })
+  });
 
   //if the user exists in the db, add to their count. If not creat a user in the db
   if (wordsCount.length !== 0 || extraCount !== 0) {
@@ -107,6 +107,31 @@ client.on('message', async (message) => {
 
   // if the command used is count, share the amount of times the user has said the word
   if (command === 'count') {
+    // checks to see if a user was @ed then gets their count and shares it
+    const user = message.mentions.members.first();
+    if (user) {
+      const userCount = await WordCount.findOne({
+        guildId: message.guild.id,
+        userId: user.user.id,
+      });
+
+      if (userCount === null || userCount === 0) {
+        message.channel.send(
+          `${user.nickname || user.user.username} hasn't said ${
+            process.env.WORD_REF
+          } yet, congrats!`
+        );
+      } else {
+        message.channel.send(
+          `${user.nickname || user.user.username} has said the ${
+            process.env.WORD_REF
+          } ${userCount.count} time(s)`
+        );
+      }
+      return;
+    }
+
+    // gets the count of the user who called the command
     const userCount = await WordCount.findOne({
       guildId: message.guild.id,
       userId: message.author.id,
@@ -126,7 +151,7 @@ client.on('message', async (message) => {
 });
 
 client.on('messageUpdate', async (oldMessage, newMessage) => {
-   // if the user is a bot skip
+  // if the user is a bot skip
   if (oldMessage.author.bot) {
     return;
   }
@@ -162,5 +187,4 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
       );
     }
   }
-
-})
+});
