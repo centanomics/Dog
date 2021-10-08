@@ -148,6 +148,41 @@ client.on('message', async (message) => {
     }
     return;
   }
+
+  if (command === 'add') {
+    if (message.author.id !== process.env.CENT_ID) {
+      message.channel.send("You're not Cent.");
+      return;
+    }
+
+    const user = message.mentions.members.first();
+    const toAdd = parseInt(args[1]);
+
+    const userCount = await WordCount.findOne({
+      guildId: message.guild.id,
+      userId: user.user.id,
+    });
+    if (userCount === null) {
+      const newUserCount = new WordCount({
+        _id: uuid.v4(),
+        userId: user.user.id,
+        guildId: message.guild.id,
+        count: toAdd,
+      });
+
+      const upUserCount = await newUserCount.save();
+    } else {
+      const userCountFields = {
+        count: userCount.count + toAdd,
+      };
+
+      const upUserCount = await WordCount.findByIdAndUpdate(
+        userCount._id,
+        { $set: userCountFields },
+        { new: true }
+      );
+    }
+  }
 });
 
 client.on('messageUpdate', async (oldMessage, newMessage) => {
