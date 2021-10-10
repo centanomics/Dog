@@ -171,6 +171,11 @@ client.on('message', async (message) => {
       });
 
       const upUserCount = await newUserCount.save();
+      message.channel.send(
+        `${user.nickname || user.user.username} new count is ${
+          newUserCount.count
+        }`
+      );
     } else {
       const userCountFields = {
         count: userCount.count + toAdd,
@@ -180,6 +185,11 @@ client.on('message', async (message) => {
         userCount._id,
         { $set: userCountFields },
         { new: true }
+      );
+      message.channel.send(
+        `${user.nickname || user.user.username} new count is ${
+          userCountFields.count
+        }`
       );
     }
   }
