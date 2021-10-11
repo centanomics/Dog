@@ -149,12 +149,15 @@ client.on('message', async (message) => {
     return;
   }
 
+  // adds a specified number to the users count only I can use the command
   if (command === 'add') {
+    // checks to see if the command caller is cent
     if (message.author.id !== process.env.CENT_ID) {
       message.channel.send("You're not Cent.");
       return;
     }
 
+    // grabs the arguments
     const user = message.mentions.members.first();
     const toAdd = parseInt(args[1]);
 
@@ -162,6 +165,9 @@ client.on('message', async (message) => {
       guildId: message.guild.id,
       userId: user.user.id,
     });
+
+    // if the user exists add to their current count.
+    // if they don't exist, add the user to the database
     if (userCount === null) {
       const newUserCount = new WordCount({
         _id: uuid.v4(),
