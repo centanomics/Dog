@@ -217,6 +217,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
       guildId: newMessage.guild.id,
       userId: newMessage.author.id,
     });
+    // if the user doesnt exist create a new user
     if (userCount === null) {
       const newUserCount = new WordCount({
         _id: uuid.v4(),
