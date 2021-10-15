@@ -29,7 +29,7 @@ client.login(process.env.DISCORD_BOT_TOKEN);
 
 // when the bot is ready logs it and sets a status
 client.on('ready', () => {
-  console.log('Dog is ready!');
+  console.log('Social Credit Bot is ready!');
   client.user.setPresence({
     activity: {
       name: '/count',
